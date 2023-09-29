@@ -30,8 +30,6 @@ def pegar_transacoes():
     conn.close()
     
     return jsonify(transacoes)
-    
-    # return 'pegando transacao'
 
 
 
@@ -131,4 +129,4 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True)
