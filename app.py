@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify, send_file
 from psycopg2 import connect, extras
-
+from flask_cors import CORS
 
 app = Flask(__name__)
+
+CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5001"}})
 
 host = 'localhost'
 port = 5432
@@ -122,11 +124,11 @@ def pegar_transacao(idtransacao):
     
     
     
-@app.get('/')    
+@app.get('/home')    
 def home():
-    return send_file('static/index.html')
+    return send_file('/home')
 
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
