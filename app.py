@@ -4,7 +4,8 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5001"}})
+# CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5001"}})
+CORS(app)
 
 host = 'localhost'
 port = 5432
@@ -119,7 +120,8 @@ def pegar_transacao(idtransacao):
     
     if transacao is None:
         return jsonify({'message': 'Transacão não econtrada'}), 404
-    
+
+    return jsonify(transacao)
     
     
 @app.get('/home')    

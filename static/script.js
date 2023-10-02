@@ -1,6 +1,8 @@
 // $ indica q é um elemento html
 
 let transacoes = [];
+let editando = false;
+let transacaoId = null;
 
 // CRUD [CREATE] PROJETO - CRIAR
 const $meuform = document.querySelector("#meu-form");
@@ -10,18 +12,41 @@ $meuform.addEventListener("submit", async (e) => {
   const valor = $meuform["valor-name"].value;
   const tipo = $meuform["radio-name"].value;
 
-  //   console.log(descricao, valor, tipo);
+  if (!editando) {
+    const response = await fetch("http://127.0.0.1:5000/api/transacoes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ descricao, valor, tipo }),
+    });
 
-  const response = await fetch("http://127.0.0.1:5000/api/transacoes", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ descricao, valor, tipo }),
-  });
+    const dados = await response.json();
+    transacoes.unshift(dados);
+  } else {
+    const response = await fetch(
+      `http://127.0.0.1:5000/api/transacoes/${transacaoId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ descricao, valor, tipo }),
+      }
+    );
 
-  const dados = await response.json();
-  console.log(dados);
+    const updateTransacao = await response.json();
+    transacoes = transacoes.map((transacao) =>
+      transacao.id === updateTransacao.idtransacao ? updateTransacao : transacao
+    );
+    console.log(transacoes);
+
+    editando = false;
+    transacaoId = null;
+  }
+
+  carregarTran(transacoes);
+
   $meuform.reset();
 });
 
@@ -39,9 +64,52 @@ function carregarTran(transacoes) {
 
   transacoes.forEach((transacao) => {
     const transacaoItem = document.createElement("tr");
-    transacaoItem.innerHTML = `${transacao.descricao} - ${transacao.valor} - ${transacao.tipo} - ${transacao.data}`;
+    transacaoItem.innerHTML = `
+      <td>${transacao.descricao}</td>
+      <td>${transacao.valor}</td>
+      <td>${transacao.tipo}</td>
+      <td>${transacao.data}</td>
+      <td class="btns">
+        <i class="bi bi-pencil-fill btn-edit"></i>
+        <i class="bi bi-trash3-fill btn-delete"></i>
+      </td>
+    `;
+    const btnDelete = transacaoItem.querySelector(".btn-delete");
+    btnDelete.addEventListener("click", async () => {
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/transacoes/${transacao.idtransacao}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await response.json();
+      transacoes = transacoes.filter(
+        (transacao) => transacao.idtransacao !== data.idtransacao
+      );
+      carregarTran(transacoes);
+    });
 
-    transacoesLista.append(transacaoItem);
+    const btnEdit = transacaoItem.querySelector(".btn-edit");
+    btnEdit.addEventListener("click", async (e) => {
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/transacoes/${transacao.idtransacao}`
+      );
+      const data = await response.json();
+      $meuform["desc-name"].value = data.descricao;
+      $meuform["valor-name"].value = data.valor;
+      $meuform["radio-name"].value = data.tipo;
+      let type = $meuform["radio-name"].value;
+      if ($meuform["radio-name"].value == "Entrada") {
+        document.querySelector("#entrada").checked = true;
+      } else {
+        document.querySelector("#saida").checked = true;
+      }
+
+      editando = true;
+      transacaoId = transacao.idtransacao;
+    });
+
+    transacoesLista.appendChild(transacaoItem);
   });
 }
 
@@ -75,23 +143,6 @@ function atualizarPGS() {
   valorNegativo();
   atualizarFonteSize();
 }
-
-//funcao para verificar se o item clicado está sendo atualizado apenas com decimais e inteiros
-document.addEventListener("input", function (event) {
-  if (event.target.classList.contains("numerico")) {
-    let content = event.target.textContent;
-    content = content.replace(/,/g, ".");
-
-    const isNumeric = /^-?\d+(\.\d*)?(\,\d*)?$/.test(content);
-
-    if (!isNumeric) {
-      event.target.textContent = event.target.previousValue || "";
-    } else {
-      event.target.previousValue = content;
-      atualizarPGS();
-    }
-  }
-});
 
 //funcao para adicionar a cor vermelha e icone no saldo caso seja negativo
 function valorNegativo() {
@@ -130,7 +181,6 @@ function atualizarFonteSize() {
     $gastos.style.fontSize = "21px";
     $saldo.style.fontSize = "21px";
 
-    console.log($comprimentoSaldo);
     // } else if ($comprimentoProventos > 21 || $comprimentoGastos > 21 || $comprimentoSaldo > 21) {
     //     $proventos.style.fontSize = '18px'
     //     $gastos.style.fontSize = '18px'
