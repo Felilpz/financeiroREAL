@@ -4,7 +4,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-# CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5001"}})
+CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5001"}})
 CORS(app)
 
 host = 'localhost'
@@ -40,11 +40,12 @@ def criar_transacoes():
     descricao = nova_transacao['descricao']
     valor = nova_transacao['valor']
     tipo = nova_transacao['tipo']
+    data = nova_transacao['dataFormatada']
 
     conn = conectando()
     cur = conn.cursor()
     
-    cur.execute('INSERT INTO transacoes(descricao, valor, tipo) VALUES (%s, %s, %s) RETURNING *', (descricao, valor, tipo))
+    cur.execute('INSERT INTO transacoes(descricao, valor, tipo, data) VALUES (%s, %s, %s, %s) RETURNING *', (descricao, valor, tipo, data))
     novo_usuario_criado = cur.fetchone()
     print(novo_usuario_criado)
     conn.commit()
@@ -89,8 +90,9 @@ def put_transacoes(idtransacao):
     descricao = novo_usuario['descricao'] 
     valor = novo_usuario['valor'] 
     tipo = novo_usuario['tipo'] 
+    data = novo_usuario['dataFormatada']
     
-    cur.execute('UPDATE transacoes SET descricao = %s, valor = %s, tipo = %s WHERE idtransacao = %s RETURNING *', (descricao, valor, tipo, idtransacao))
+    cur.execute('UPDATE transacoes SET descricao = %s, valor = %s, tipo = %s, data = %s WHERE idtransacao = %s RETURNING *', (descricao, valor, tipo, data, idtransacao))
     usuario_atualizado = cur.fetchone()
     
     conn.commit()

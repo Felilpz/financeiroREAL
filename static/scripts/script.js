@@ -25,7 +25,7 @@ $meuform.addEventListener("submit", async (e) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ descricao, valor, tipo }),
+      body: JSON.stringify({ descricao, valor, tipo, dataFormatada }),
     });
 
     const dados = await response.json();
@@ -39,7 +39,7 @@ $meuform.addEventListener("submit", async (e) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ descricao, valor, tipo }),
+        body: JSON.stringify({ descricao, valor, tipo, dataFormatada }),
       }
     );
 
@@ -53,7 +53,7 @@ $meuform.addEventListener("submit", async (e) => {
     transacaoId = null;
     carregarTran(transacoes);
   }
-
+  location.reload();
   $meuform.reset();
 });
 
@@ -69,8 +69,8 @@ function carregarTran(transacoes) {
       <td>${transacao.tipo}</td>
       <td>${transacao.data}</td>
       <td class="btns">
-        <i class="bi bi-pencil-fill btn-edit"></i>
-        <i class="bi bi-trash3-fill btn-delete"></i>
+        <i class="bi bi-pencil-fill btn-edit" data-id"${transacao.idtransacao}"></i>
+        <i class="bi bi-trash3-fill btn-delete" data-id"${transacao.idtransacao}"></i>
       </td>
     `;
     const btnDelete = transacaoItem.querySelector(".btn-delete");
@@ -111,3 +111,21 @@ function carregarTran(transacoes) {
     transacoesLista.appendChild(transacaoItem);
   });
 }
+
+// data
+function formatarData(numero) {
+  if (numero <= 9) {
+    return "0" + numero;
+  } else {
+    return numero;
+  }
+}
+
+let dataAtual = new Date();
+let dataFormatada =
+  formatarData(dataAtual.getDate().toString()) +
+  "/" +
+  formatarData(dataAtual.getMonth() + 1).toString() +
+  "/" +
+  dataAtual.getFullYear();
+console.log(dataFormatada);
