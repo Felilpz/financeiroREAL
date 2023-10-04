@@ -9,7 +9,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const response = await fetch("http://127.0.0.1:5000/api/transacoes");
   const dados = await response.json();
   transacoes = dados;
-  carregarTran(transacoes);
+  carregarTransacoes(transacoes);
 });
 
 // PROJETO - CRIAR
@@ -19,45 +19,53 @@ $meuform.addEventListener("submit", async (e) => {
   const valor = $meuform["valor-name"].value;
   const tipo = $meuform["radio-name"].value;
 
+
   if (!editando) {
     const response = await fetch("http://127.0.0.1:5000/api/transacoes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ descricao, valor, tipo, dataFormatada }),
+      body: JSON.stringify({
+        descricao,
+        valor,
+        tipo,
+        dataFormatada
+      }),
     });
 
     const dados = await response.json();
     transacoes.push(dados);
-    carregarTran(transacoes);
+
+    carregarTransacoes(transacoes);
   } else {
     const response = await fetch(
-      `http://127.0.0.1:5000/api/transacoes/${transacaoId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ descricao, valor, tipo, dataFormatada }),
-      }
-    );
+      `http://127.0.0.1:5000/api/transacoes/${transacaoId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        descricao,
+        valor,
+        tipo,
+        dataFormatada
+      }),
+    });
 
     const updateTransacao = await response.json();
-    transacoes = transacoes.map((transacao) =>
-      transacao.idtransacao === updateTransacao.idtransacao
-        ? updateTransacao
-        : transacao
-    );
+    transacoes = transacoes.map((transacao) => transacao.idtransacao === updateTransacao.idtransacao ? updateTransacao : transacao);
+
+    carregarTransacoes(transacoes);
+
     editando = false;
     transacaoId = null;
-    carregarTran(transacoes);
   }
   location.reload();
   $meuform.reset();
 });
 
-function carregarTran(transacoes) {
+function carregarTransacoes(transacoes) {
   const transacoesLista = document.getElementById("corpoTabela");
   transacoesLista.innerHTML = "";
 
@@ -73,30 +81,37 @@ function carregarTran(transacoes) {
         <i class="bi bi-trash3-fill btn-delete" data-id"${transacao.idtransacao}"></i>
       </td>
     `;
+
+    // deletar transacao
     const btnDelete = transacaoItem.querySelector(".btn-delete");
     btnDelete.addEventListener("click", async (e) => {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/transacoes/${transacao.idtransacao}`,
-        {
-          method: "DELETE",
-        }
-      );
+        `http://127.0.0.1:5000/api/transacoes/${transacao.idtransacao}`, {
+        method: "DELETE",
+      });
+
       const data = await response.json();
+
       transacoes = transacoes.filter(
         (transacao) => transacao.idtransacao !== data.idtransacao
       );
-      carregarTran(transacoes);
+      carregarTransacoes(transacoes);
     });
 
+    transacoesLista.appendChild(transacaoItem);
+
+    //editar transacao
     const btnEdit = transacaoItem.querySelector(".btn-edit");
     btnEdit.addEventListener("click", async (e) => {
       const response = await fetch(
         `http://127.0.0.1:5000/api/transacoes/${transacao.idtransacao}`
       );
+
       const data = await response.json();
       $meuform["desc-name"].value = data.descricao;
       $meuform["valor-name"].value = data.valor;
       $meuform["radio-name"].value = data.tipo;
+
       let type = $meuform["radio-name"].value;
       if ($meuform["radio-name"].value == "Entrada") {
         document.querySelector("#entrada").checked = true;
@@ -107,8 +122,6 @@ function carregarTran(transacoes) {
       editando = true;
       transacaoId = transacao.idtransacao;
     });
-
-    transacoesLista.appendChild(transacaoItem);
   });
 }
 

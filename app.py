@@ -28,7 +28,7 @@ def pegar_transacoes():
     transacoes = cur.fetchall()
 
     cur.close()
-    conn.close()
+    conn.close() 
     
     return jsonify(transacoes)
 
@@ -75,7 +75,6 @@ def deletar_transacoes(idtransacao):
 
     if transacao is None:
         return jsonify({'message': 'Transacão não econtrada'}), 404
-    
     return jsonify(transacao)
 
 
@@ -102,7 +101,6 @@ def put_transacoes(idtransacao):
     
     if usuario_atualizado is None:
         return jsonify({"message": "Transação não encontrada"}), 404 
-    
     return jsonify(usuario_atualizado)
 
 
@@ -122,13 +120,12 @@ def pegar_transacao(idtransacao):
     
     if transacao is None:
         return jsonify({'message': 'Transacão não econtrada'}), 404
-
     return jsonify(transacao)
     
     
 @app.get('/home')    
 def home():
-    return send_file('/home')
+    return send_file('static/index.html')
 
 
 
