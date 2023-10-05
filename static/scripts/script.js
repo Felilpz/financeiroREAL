@@ -15,8 +15,8 @@ window.addEventListener("DOMContentLoaded", async () => {
 // PROJETO - CRIAR
 $meuform.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const descricao = $meuform["desc-name"].value;
-  const valor = $meuform["valor-name"].value;
+  const descricao = document.getElementById('form-desc')
+  const valor = document.getElementById('form-valor')
   const tipo = $meuform["radio-name"].value;
 
 
@@ -36,11 +36,9 @@ $meuform.addEventListener("submit", async (e) => {
 
     const dados = await response.json();
     transacoes.push(dados);
-
     carregarTransacoes(transacoes);
   } else {
-    const response = await fetch(
-      `http://127.0.0.1:5000/api/transacoes/${transacaoId}`, {
+    const response = await fetch(`http://127.0.0.1:5000/api/transacoes/${transacaoId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -61,9 +59,10 @@ $meuform.addEventListener("submit", async (e) => {
     editando = false;
     transacaoId = null;
   }
-  location.reload();
+  // location.reload();
   $meuform.reset();
 });
+
 
 function carregarTransacoes(transacoes) {
   const transacoesLista = document.getElementById("corpoTabela");
@@ -74,11 +73,11 @@ function carregarTransacoes(transacoes) {
     transacaoItem.innerHTML = `
       <td>${transacao.descricao}</td>
       <td>${transacao.valor}</td>
-      <td>${transacao.tipo}</td>
+      <td class="tipo">${transacao.tipo}</td>
       <td>${transacao.data}</td>
       <td class="btns">
-        <i class="bi bi-pencil-fill btn-edit" data-id"${transacao.idtransacao}"></i>
-        <i class="bi bi-trash3-fill btn-delete" data-id"${transacao.idtransacao}"></i>
+        <i data-id"${transacao.idtransacao} class="bi bi-pencil-fill btn-edit""></i>
+        <i data-id"${transacao.idtransacao} class="bi bi-trash3-fill btn-delete""></i>
       </td>
     `;
 
@@ -125,20 +124,13 @@ function carregarTransacoes(transacoes) {
   });
 }
 
-// data
-function formatarData(numero) {
-  if (numero <= 9) {
-    return "0" + numero;
-  } else {
-    return numero;
-  }
-}
 
-let dataAtual = new Date();
-let dataFormatada =
-  formatarData(dataAtual.getDate().toString()) +
-  "/" +
-  formatarData(dataAtual.getMonth() + 1).toString() +
-  "/" +
-  dataAtual.getFullYear();
-console.log(dataFormatada);
+// // CARREGAR CARDS
+// window.addEventListener("DOMContentLoaded", async () => {
+//   const response = await fetch("http:127.0.1:5000/valores")
+//   const dados = await response.json()
+//   valores = dados
+//   console.log(valores.saldo)
+// })
+
+// window.onload

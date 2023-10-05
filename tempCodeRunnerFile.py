@@ -1,3 +1,2 @@
 
-    else:
-        return jsonify({'error': 'Transação não encontrada'}), 404
+    data = nova_transacao['dataFormatada']
