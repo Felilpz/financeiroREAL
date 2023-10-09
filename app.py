@@ -149,26 +149,26 @@ def pegar_transacao(idtransacao):
 #     return jsonify(gastos)
 
 
-# @app.get('/valores')
-# def pegar_saldo():
-#     conn = conectando()
-#     cur = conn.cursor(cursor_factory=extras.RealDictCursor)
+@app.get('/valores')
+def pegar_saldo():
+    conn = conectando()
+    cur = conn.cursor(cursor_factory=extras.RealDictCursor)
 
-#     cur.execute(
-#         """SELECT
-#     SUM(CASE WHEN tipo = 'Entrada' THEN valor ELSE 0 END) as total_entradas,
-#     SUM(CASE WHEN tipo = 'Saida' THEN valor ELSE 0 END) as total_saida,
-#     SUM(CASE WHEN tipo = 'Entrada' THEN valor ELSE -valor END) as saldo
-# FROM
-#     transacoes;"""
+    cur.execute(
+        """SELECT
+    SUM(CASE WHEN tipo = 'Entrada' THEN valor ELSE 0 END) as total_entradas,
+    SUM(CASE WHEN tipo = 'Saida' THEN valor ELSE 0 END) as total_saida,
+    SUM(CASE WHEN tipo = 'Entrada' THEN valor ELSE -valor END) as saldo
+FROM
+    transacoes;"""
 
-#     )
-#     saldo = cur.fetchone()
+    )
+    saldo = cur.fetchone()
 
-#     cur.close()
-#     conn.close()
+    cur.close()
+    conn.close()
 
-#     return jsonify(saldo)
+    return jsonify(saldo)
 
 
 @app.get('/home')
